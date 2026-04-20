@@ -4,7 +4,7 @@ from . import db
 class Movies(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(80))
+    title = db.Column(db.String(80), unique=True, nullable=False)
     desc = db.Column(db.Text)
     posterName = db.Column(db.String(100))
     date_created = db.Column(db.DateTime,default=db.func.current_timestamp() )

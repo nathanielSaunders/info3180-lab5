@@ -26,7 +26,13 @@ function saveMovie() {
             'X-CSRFToken': csrf_token.value 
         }
     })
-    .then(response => response.json())
+    .then(response => {
+      if (response.ok){
+        movieForm.reset();
+      }
+    
+    return response.json();
+  })
     .then(data => {
         console.log(data); 
     })
@@ -35,11 +41,21 @@ function saveMovie() {
 </script>
 
 <template>
-  <form id="movieForm" @submit.prevent="saveMovie"> 
+  <form id="movieForm" enctype="multipart/form-data" @submit.prevent="saveMovie"> 
     <div class="form-group mb-3">
       <label for="title" class="form-label">Movie Title</label>
       <input type="text" name="title" class="form-control" /> 
     </div>
+    <div class="form-group mb-3">
+      <label for="Movie Description" class="form-label">Movie Description</label>
+      <textarea name="description" class="form-control"> </textarea>
+    </div>
+    <div class="form-group mb-3">
+      <label for="Movie Poster" class="form-label">Movie Poster</label>
+      <input type="file" name="poster" class="form-control" /> 
+    </div>
+    
+
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </template>

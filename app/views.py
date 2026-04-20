@@ -21,7 +21,7 @@ from app.forms import MovieForm
 def index():
     return jsonify(message="This is the beginning of our API")
 
-@app.route('/api/v1/movies',methods=['POST','GET'])
+@app.route('/api/v1/movies',methods=['POST'])
 def movies():
     form = MovieForm()
     
@@ -31,6 +31,10 @@ def movies():
         poster= form.poster.data
         posterName = secure_filename(poster.filename)
         
+        movie_exists = Movies.query.filter_by(title=title).first()
+        if movie_exists:
+            return jsonify({"errors": ["Movie already exists in database"]})
+        
         newmovie = Movies(title=title,desc=description,posterName=posterName)
         db.session.add(newmovie)
         db.session.commit()
@@ -39,14 +43,14 @@ def movies():
             app.config['UPLOAD_FOLDER'],posterName
         ))
         
-        return {
+        return jsonify({
                 "message": "Movie Successfully added", 
                 "title": title ,
                 "poster": posterName, 
                 "description": description
-            }
+            })
     else:
-        {
+        return {
             "errors":form_errors(form)
         }
     
@@ -57,15 +61,15 @@ def get_csrf():
 
 @app.route('/api/v1/movies', methods=['GET'])
 def get_movies():
-    movies_list = Movie.query.all()
+    movies_list = Movies.query.all()
     movies = []
     
     for movie in movies_list:
         movies.append({
             "id": movie.id,
             "title": movie.title,
-            "description": movie.description,
-            "poster": f"/api/v1/posters/{movie.poster}" 
+            "description": movie.desc,
+            "poster": f"/api/v1/posters/{movie.posterName}" 
         })
     
     return jsonify({"movies": movies})
